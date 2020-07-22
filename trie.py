@@ -4,9 +4,10 @@ from chars_data import chars
 class TrieNode:
     
     def __init__(self): 
-        self.children = [None]*67
+        self.children = [None]*69
         self.isEndOfWord = False
-        self.URL = [None]*5
+        self.URL = list()
+        
         
 class Trie:
     
@@ -16,26 +17,44 @@ class Trie:
     def getNode(self):  
         return TrieNode()
         
-    def insert(self,sentence, index=0):
+    def insert(self,sentence, index, ID):
         
         pCrawl = self.root
         for level in sentence[index:]:
             
             if not pCrawl.children[chars[level]]: 
-                pCrawl.children[chars[level]] = self.getNode()
-                
-            for i in range(5):
-                if pCrawl.URL[i] == None:
-# לשנות לכתובת של המשפט
-                    pCrawl.URL[i] = sentence
-                    break
+                pCrawl.children[chars[level]] = self.getNode() 
             pCrawl = pCrawl.children[chars[level]]
-        pCrawl.isEndOfWord = True
-        
+            if len(pCrawl.URL) < 5:
+                pCrawl.URL.append(ID)
+                
+            pCrawl.isEndOfWord = True
+  
     def search(self, sentence): 
-        pCrawl = self.root 
-        for level in sentence: 
-            pCrawl = pCrawl.children[chars[level]] 
-            if pCrawl == None:
-                return None
-        return pCrawl.URL
+        return rec_search(self.root, sentence, False, 0)
+        
+        
+def rec_search(node, sentence, flag, index):
+    res = list()
+    
+    if index == len(sentence):
+        return node.URL
+    next_node = node.children[chars[sentence[index]]]
+     
+    if next_node:
+        
+        res += rec_search(next_node,sentence ,flag , index+1)
+        if 5 == len(res):
+            return res
+            
+    if not flag:
+        
+        for char in chars.keys():
+            if char != sentence[index]:
+                
+                new_sentence = sentence[:index] +  char + sentence[index+1:]
+                res += rec_search(node,new_sentence, True, index)
+                if 5 == len(res):
+                    return res
+    else:
+        return res
