@@ -6,7 +6,7 @@ class TrieNode:
     def __init__(self): 
         self.children = [None]*69
         self.isEndOfWord = False
-        self.URL = list()
+        self.URL = set()
         
         
 class Trie:
@@ -26,7 +26,7 @@ class Trie:
                 pCrawl.children[chars[level]] = self.getNode() 
             pCrawl = pCrawl.children[chars[level]]
             if len(pCrawl.URL) < 5:
-                pCrawl.URL.append(ID)
+                pCrawl.URL.add(ID)
                 
             pCrawl.isEndOfWord = True
   
@@ -35,15 +35,19 @@ class Trie:
         
         
 def rec_search(node, sentence, flag, index):
-    res = list()
+    res = set()
     
     if index == len(sentence):
         return node.URL
     next_node = node.children[chars[sentence[index]]]
      
     if next_node:
-        
-        res += rec_search(next_node,sentence ,flag , index+1)
+        new_res = rec_search(next_node,sentence ,flag , index+1)
+        if new_res:
+            if len(new_res) + len(res) > 5:
+                res = res.union(set(list(new_res)[:5 - len(new_res)]))
+            else:
+                res = res.union(new_res)
         if 5 == len(res):
             return res
             
@@ -53,8 +57,15 @@ def rec_search(node, sentence, flag, index):
             if char != sentence[index]:
                 
                 new_sentence = sentence[:index] +  char + sentence[index+1:]
-                res += rec_search(node,new_sentence, True, index)
+                new_res = rec_search(node,new_sentence, True, index)
+                if new_res:
+                    if new_res:
+                        if len(new_res) + len(res) > 5:
+                            res = res.union(set(list(new_res)[:5 - len(new_res)]))
+                        else:
+                            res = res.union(new_res)
+                            
                 if 5 == len(res):
                     return res
-    else:
-        return res
+                    
+    return res

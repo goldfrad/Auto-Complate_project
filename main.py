@@ -4,6 +4,7 @@ import input_processing
 import os
 import sys
 import ID_sentence
+import linecache
 
 ID = 0
 ID_sentences = list()
@@ -31,19 +32,29 @@ def main():
     
     t = trie.Trie()
     
-    insert_data(t, "abstract.txt")
-    insert_data(t, "allocation.txt")
-    insert_data(t, "apiabiversion.txt")
-    insert_data(t, "arg.txt")
-    insert_data(t, "bool.txt")
-    insert_data(t, "buffer.txt")
-    insert_data(t, "bytearray.txt")
-    insert_data(t, "bytes.txt")
-    
-#   URL = t.search(input_processing.clearing_the_sentence("go"))
-#   for url in URL:
-#       if url:
-#           print(url)
-# 
+    for file in os.listdir("data"):
+        if file.endswith(".txt"):
+            insert_data(t, os.path.join("data", file))
+
+    input_user = ""
+    while input_user != "stop":
+        print("your input --->", end=' ')
+        input_user = input()
+        t1 = time.time()
+        URL = t.search(input_processing.clearing_the_sentence(input_user))
+        i = 0
+        if URL:
+            for url in URL:
+                i += 1
+                if url:
+                    line = linecache.getline((ID_sentences[url]).routing, (ID_sentences[url]).line)
+                    print("---------------------------")
+                    print("Sentence routing is: " + (ID_sentences[url]).routing)
+                    print("Line of sentance is: " + str((ID_sentences[url]).line))
+                    print("[" + str(i) + "] " + line)
+
+        print(time.time()-t1)
+   
+ 
 if __name__ == '__main__': 
     main() 
